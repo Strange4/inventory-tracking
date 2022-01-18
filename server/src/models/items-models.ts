@@ -1,13 +1,14 @@
 import Joi from 'joi';
 import { v4 as uuidv4 } from 'uuid';
-class Item {
+class Item implements IStorable {
     public readonly id;
-    public readonly name;
-    public readonly description;
-    constructor(name: string, description: string){
+    public readonly content;
+    constructor(name: string, description: string) {
         this.id = uuidv4();
-        this.name = name;
-        this.description = description;
+        this.content = {
+            name,
+            description
+        }
     }
 
     static getSchema(): Joi.ObjectSchema<any> {
@@ -18,4 +19,9 @@ class Item {
     }
 }
 
-export default Item;
+interface IStorable {
+    id: string;
+    content: any;
+}
+
+export {Item, IStorable};

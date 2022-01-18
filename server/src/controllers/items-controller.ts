@@ -1,5 +1,5 @@
-import Item from "../models/items-models";
-import dbInstance from "../db/database";
+import {Item} from "../models/items-models";
+import {dbInstance} from "../db/database";
 import Joi from 'joi';
 import express from 'express';
 interface Controller {
@@ -24,7 +24,7 @@ class ItemController implements Controller {
             response.sendStatus(422);
         } else {
             const { value } = validationResult;
-            const item:Item = value;
+            const item = new Item(value.name, value.description);
             dbInstance.save(this.collectionName, item);
             response.sendStatus(201);
         }
