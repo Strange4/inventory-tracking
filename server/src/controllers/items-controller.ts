@@ -26,7 +26,7 @@ class ItemController implements Controller {
             const { value } = validationResult;
             const item = new Item(value.name, value.description);
             dbInstance.save(this.collectionName, item);
-            response.sendStatus(201);
+            response.status(201).json(item);
         }
         next();
     }
