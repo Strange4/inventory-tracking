@@ -14,9 +14,10 @@ describe('api testing', ()=>{
             server?.close();
         });
         describe('get requests', ()=>{
-            it('should return 404 on server init', async ()=>{
+            it('should return an empty array on server init', async ()=>{
                 const result = await agent.get('/api/items');
-                expect(result.statusCode).toBe(404);
+                expect(result.body).toStrictEqual([]);
+                expect(result.statusCode).toBe(200);
             });
             it('should have the the items after sending a post request', async ()=>{
                 const myObj = {name: "my name is slim shady", quantity:0};

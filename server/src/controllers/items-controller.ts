@@ -12,13 +12,12 @@ interface Controller {
 }
 class ItemController implements Controller {
     private readonly collectionName = 'items';
+    constructor(){
+        dbInstance.save(this.collectionName);
+    }
     listAll = (request: express.Request, response: express.Response, next: express.NextFunction)=>{
         const allItems = dbInstance.get(this.collectionName);
-        if(allItems){
-            response.status(200).json(allItems);
-        } else {
-            response.sendStatus(404);
-        }
+        response.status(200).json(allItems);
         next();
     }
     create = (request: express.Request, response: express.Response, next: express.NextFunction)=>{

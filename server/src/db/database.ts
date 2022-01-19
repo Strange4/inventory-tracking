@@ -1,7 +1,7 @@
 import { IStorable } from "../models/items-model";
 
 interface IDatabase{
-    save(collectionName: string, document:IStorable): void;
+    save(collectionName: string, document?:IStorable[] | IStorable): void;
     get(collectionName: string, documentID?: IStorable['id']): IStorable[] | IStorable | undefined;
     delete(collectionName: string, documentID?: IStorable['id']): boolean;
     update(collectionName: string, documentID: IStorable): boolean;
@@ -10,7 +10,11 @@ interface IDatabase{
 
 class Database implements IDatabase {
     private readonly collections = new Map<string, IStorable[]>();
-    save(collectionName: string, document:any | any[]){
+    save(collectionName: string, document?:IStorable[] | IStorable){
+        if(!document){
+            this.collections.set(collectionName, []);
+            return;
+        }
         const updatedCollection = document instanceof Array ? [...document] : [document];
         const collection = this.collections.get(collectionName);
         if(collection){
