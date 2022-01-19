@@ -4,5 +4,6 @@ const itemsRoute = Router();
 
 itemsRoute.get('/', ItemController.listAll);
 itemsRoute.post('/', ItemController.create);
+itemsRoute.delete('/', ItemController.delete);
 
 export default itemsRoute;

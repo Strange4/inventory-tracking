@@ -11,8 +11,16 @@ class Item implements IStorable {
         }
     }
 
-    static getSchema(): Joi.ObjectSchema<any> {
+    static getSchema(): Joi.ObjectSchema {
         return Joi.object({
+            name: Joi.string().max(50).required(),
+            description: Joi.string().max(500)
+        });
+    }
+
+    static getSchemaWithId(): Joi.ObjectSchema {
+        return Joi.object({
+            id: Joi.string().max(36).min(36).required(),
             name: Joi.string().max(50).required(),
             description: Joi.string().max(500)
         });

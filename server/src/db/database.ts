@@ -4,6 +4,7 @@ interface IDatabase{
     save(collectionName: string, document:IStorable): void;
     get(collectionName: string, documentID?: IStorable['id']): IStorable[] | IStorable | undefined;
     delete(collectionName: string, documentID?: IStorable['id']): boolean;
+    update(collectionName: string, documentID: IStorable['id']): boolean;
 }
 
 
@@ -40,7 +41,10 @@ class Database implements IDatabase {
         }
         return this.collections.delete(collectionName)
     }
-
+    
+    update(collectionName: string, documentID: string): boolean {
+        throw new Error("Method not implemented.");
+    }
 }
 
 const dbInstance:IDatabase = new Database();
