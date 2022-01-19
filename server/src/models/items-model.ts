@@ -3,11 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 class Item implements IStorable {
     public readonly id;
     public readonly content;
-    constructor(name: string, description: string, id?: string) {
+    constructor(name: string, description: string, quantity: number, id?: string) {
         this.id = id || uuidv4();
         this.content = {
             name,
-            description
+            description,
+            quantity
         }
     }
 
@@ -28,7 +29,8 @@ class Item implements IStorable {
     static getSchema(): Joi.ObjectSchema {
         return Joi.object({
             name: Joi.string().max(50).required(),
-            description: Joi.string().max(500)
+            description: Joi.string().max(500),
+            quantity: Joi.number().min(0).required()
         });
     }
 
@@ -36,7 +38,8 @@ class Item implements IStorable {
         return Joi.object({
             id: Joi.string().max(36).min(36).required(),
             name: Joi.string().max(50).required(),
-            description: Joi.string().max(500)
+            description: Joi.string().max(500),
+            quantity: Joi.number().min(0).required()
         });
     }
 }

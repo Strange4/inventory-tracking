@@ -23,10 +23,11 @@ class ItemController implements Controller {
     }
     create = (request: express.Request, response: express.Response, next: express.NextFunction)=>{
         const validationResult = validateItem(request.body);
-        if(!validationResult){
-            response.sendStatus(422);
+        if(validationResult.error){
+            response.status(422).json(validationResult.error);
         } else {
-            const item = new Item(validationResult.name, validationResult.description);
+            const {value} = validationResult;
+            const item = new Item(value.name, value.description, value.quantity);
             dbInstance.save(this.collectionName, item);
             response.status(201).json(item);
         }
@@ -59,11 +60,12 @@ class ItemController implements Controller {
 
     update = (request: express.Request, response: express.Response, next: express.NextFunction) =>{
         const validationResult = validateItemWithId(request.body);
-        if(!validationResult){
-            response.sendStatus(422);
+        if(validationResult.error){
+            response.status(422).send(validationResult.error);
         } else {
-            const item = new Item(validationResult.name, validationResult.description, validationResult.id);
-            const updateResult = dbInstance.update(this.collectionName, validationResult);
+            const {value} = validationResult;
+            const item = new Item(value.name, value.description, value.quantity, value.id);
+            const updateResult = dbInstance.update(this.collectionName, item);
             updateResult ?  response.status(200).json(dbInstance.get(this.collectionName, item.id)) : response.status(404).send('no item with that id');
         }
         next();
@@ -91,17 +93,19 @@ function validateHasId(requestBody: any){
         id: Joi.string().max(36).min(36).required()
     });
     const result = schema.validate(requestBody);
-    return result.value ? true : false;
+    return result.error ? true : false;
 }
 
 function validateItemWithId(requestBody: any){
     const schema = Item.getSchemaWithId();
-    return schema.validate(requestBody).value;
+    const result = schema.validate(requestBody);
+    return result;
 }
 
 function validateItem(requestBody: any){
     const schema = Item.getSchema();
-    return schema.validate(requestBody).value;
+    const result = schema.validate(requestBody)    
+    return result;
 }
 
 
