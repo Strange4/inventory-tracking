@@ -1,23 +1,23 @@
-import { IStorable } from "../models/items-models";
+import { IStorable } from "../models/items-model";
 
 interface IDatabase{
     save(collectionName: string, document:IStorable): void;
     get(collectionName: string, documentID?: IStorable['id']): IStorable[] | IStorable | undefined;
     delete(collectionName: string, documentID?: IStorable['id']): boolean;
-    update(collectionName: string, documentID: IStorable['id']): boolean;
+    update(collectionName: string, documentID: IStorable): boolean;
 }
 
 
 class Database implements IDatabase {
     private readonly collections = new Map<string, IStorable[]>();
-    save(collectionName: string, document:any){
+    save(collectionName: string, document:any | any[]){
+        const updatedCollection = document instanceof Array ? [...document] : [document];
         const collection = this.collections.get(collectionName);
         if(collection){
-            collection.push(document);
-            this.collections.set(collectionName, collection);
+            this.collections.set(collectionName, updatedCollection);
             return;
         }
-        this.collections.set(collectionName, [document]);
+        this.collections.set(collectionName, updatedCollection);
     }
     get(collectionName: string, documentID?: IStorable['id']): IStorable[] | IStorable | undefined{
         const collection = this.collections.get(collectionName);
@@ -39,11 +39,21 @@ class Database implements IDatabase {
             this.collections.set(collectionName, newCollection);
             return true;
         }
-        return this.collections.delete(collectionName)
+        return this.collections.delete(collectionName);
     }
     
-    update(collectionName: string, documentID: string): boolean {
-        throw new Error("Method not implemented.");
+    update(collectionName: string, documentToUpdate: IStorable): boolean {
+        const collection = this.collections.get(collectionName);
+        if(collection){
+            const document = collection.find(document=>{return document.id === documentToUpdate.id});
+            if(document){
+                this.delete(collectionName, document.id);
+                this.save(collectionName, documentToUpdate);
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }
 
