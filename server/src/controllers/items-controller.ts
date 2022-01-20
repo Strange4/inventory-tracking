@@ -48,7 +48,8 @@ class ItemController implements Controller {
     }
 
     deleteAll = (request: express.Request, response: express.Response, next: express.NextFunction)=>{
-        const deletionResult = dbInstance.delete(this.collectionName);    
+        const deletionResult = dbInstance.delete(this.collectionName);
+        dbInstance.save(this.collectionName);
         if(!deletionResult){
             response.sendStatus(404);
         } else {
@@ -92,7 +93,7 @@ function validateHasId(requestBody: any){
         id: Joi.string().max(36).min(36).required()
     });
     const result = schema.validate(requestBody);
-    return result.error ? true : false;
+    return result.error === undefined;
 }
 
 function validateItemWithId(requestBody: any){
