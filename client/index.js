@@ -1,9 +1,6 @@
 async function start(){
-    createItem(new Item('my item name', 10, 'my description'))
-    .then(async (item)=>{
-        console.log(await toCSV(item.id))
-    })
-    .then(updateTableFromAPI);
+    updateTableFromAPI()
+    hideUpdateButton();
 }
 
 /**
@@ -132,7 +129,7 @@ function itemToRow(item){
             row.appendChild(td);
         }
     }
-    const buttons = [deleteButton(item), downloadCSVButton(item)];
+    const buttons = [deleteButton(item), downloadCSVButton(item), updateButton(item)];
     for(const button of buttons){
         const td = document.createElement('td');
         td.appendChild(button);
@@ -172,7 +169,7 @@ function downloadCSVButton(item){
     return button;
 }
 
-async function updateButton(item){
+function updateButton(item){
     const button = document.createElement('input');
     button.type = "button";
     button.value = "update";
@@ -181,8 +178,35 @@ async function updateButton(item){
         const name = document.getElementById('item-name');
         const quantity = document.getElementById('quantity');
         const description = document.getElementById('description');
-        // name.value = 'yourmom';
+        name.value = item.name;
+        quantity.value = item.quantity;
+        description.value = item.description;
+        showUpdateButton(item.id);
     }
+    return button;
+}
+
+function updateForm(event){
+    const name = document.getElementById('item-name').value;
+    const quantity = document.getElementById('quantity').value;
+    const description = document.getElementById('description').value;
+    if(!name || !quantity) return;
+    if(quantity < 0) return;
+    console.log('updating item item');
+    console.log(name, quantity, description, event.target.getAttribute('itemid'));
+    const item = new Item(name, Number(quantity), description, event.target.getAttribute('itemid'));
+    updateItem(item).then(updateTableFromAPI)
+    hideUpdateButton();
+}
+
+function hideUpdateButton(){
+    const button = document.getElementById('update');
+    button.style.display = 'none';
+}
+function showUpdateButton(itemID){
+    const button = document.getElementById('update');
+    button.style.display = 'inline-block';
+    button.setAttribute('itemID', itemID);
 }
 
 /**
