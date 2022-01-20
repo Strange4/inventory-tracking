@@ -10,5 +10,6 @@ itemsRoute.post('/', ItemController.create);
 itemsRoute.delete('/', ItemController.delete);
 itemsRoute.delete('/all', ItemController.deleteAll);
 itemsRoute.put('/', ItemController.update)
+itemsRoute.post('/csv', ItemController.toCSVString)
 
 export default itemsRoute;

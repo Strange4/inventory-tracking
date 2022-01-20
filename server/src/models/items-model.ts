@@ -21,7 +21,7 @@ class Item implements IStorable {
         }
         output+= `\n${item.id}`;
         for(const value of values){
-            output+= value;
+            output+= `,${value}`;
         }
         return output;
     }

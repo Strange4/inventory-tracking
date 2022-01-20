@@ -1,6 +1,9 @@
 async function start(){
-    createItem(new Item('my item name', 10, 'my description'));
-    updateTableFromAPI();
+    createItem(new Item('my item name', 10, 'my description'))
+    .then(async (item)=>{
+        console.log(await toCSV(item.id))
+    })
+    .then(updateTableFromAPI);
 }
 
 /**
@@ -47,14 +50,14 @@ async function createItem(item){
 }
 /**
  * deletes an item from the db
- * @param {Item} item the item to be deleted from the db
+ * @param {Item['id']} id the item to be deleted from the db
  */
-async function deleteItem(item){
+async function deleteItem(id){
     const request = new XMLHttpRequest();
     request.open('DELETE', "http://localhost:5000/api/items");
     request.setRequestHeader('Accept', 'application/json');
     request.setRequestHeader('Content-Type', 'application/json');
-    request.send(JSON.stringify({id: item.id}));
+    request.send(JSON.stringify({id: id}));
     const response = await new Promise((resolve, reject)=>{
         request.addEventListener('load', (ProgressEvent)=>{
             resolve(ProgressEvent.currentTarget);
@@ -75,6 +78,26 @@ async function deleteAll(){
         });
         return response.responseText;
     }
+}
+
+/**
+ * gets the csv of an item from the db
+ * @param {Item['id']} id the id of the item
+ */
+async function toCSV(id){
+
+    const request = new XMLHttpRequest();
+    request.open('POST', "http://localhost:5000/api/items/csv");
+    request.setRequestHeader('Accept', 'application/json');
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.send(JSON.stringify({id: id}));
+    console.log({id: id})
+    const response = await new Promise((resolve, reject)=>{
+        request.addEventListener('load', (ProgressEvent)=>{
+            resolve(ProgressEvent.currentTarget);
+        });
+    });
+    return response.responseText;
 }
 
 /**
@@ -109,7 +132,57 @@ function itemToRow(item){
             row.appendChild(td);
         }
     }
+    const buttons = [deleteButton(item), downloadCSVButton(item)];
+    for(const button of buttons){
+        const td = document.createElement('td');
+        td.appendChild(button);
+        row.appendChild(td);
+    }
     return row;
+}
+
+function deleteButton(item){
+    const button = document.createElement('input');
+    button.type = "button";
+    button.value = "delete";
+    button.setAttribute('itemID', item.id);
+    button.onclick = function(event){
+        deleteItem(event.target.getAttribute('itemid')).then( async ()=>{
+            await updateTableFromAPI();
+        });
+    }
+    return button;
+}
+
+function downloadCSVButton(item){
+    const button = document.createElement('input');
+    button.type = 'button';
+    button.value = "toCSV";
+    button.setAttribute('itemID', item.id);
+    button.onclick = function(event){
+        toCSV(item.id).then((csvString)=>{
+            const link = document.createElement('a');
+            link.download = 'data.csv';
+            const content = "data:text/csv;charset=utf-8," + csvString;
+            const uri = encodeURI(content);
+            link.href = uri;
+            link.click();
+        });
+    }
+    return button;
+}
+
+async function updateButton(item){
+    const button = document.createElement('input');
+    button.type = "button";
+    button.value = "update";
+    button.setAttribute('itemID', item.id);
+    button.onclick = function (event){
+        const name = document.getElementById('item-name');
+        const quantity = document.getElementById('quantity');
+        const description = document.getElementById('description');
+        // name.value = 'yourmom';
+    }
 }
 
 /**
@@ -131,6 +204,7 @@ function itemsToRows(items){
  */
 function addRowsToTable(rows){
     const table = document.getElementById('table-body');
+    table.innerHTML = '';
     for(const row of rows){
         table.appendChild(row);
     }
@@ -139,8 +213,19 @@ function addRowsToTable(rows){
 async function updateTableFromAPI(){
     const items = await fetchItems();
     const rows = itemsToRows(items);
-    addRowsToTable(rows)
+    addRowsToTable(rows);
+    console.log('updating the table')
 }
 
-
+function createItemForm(){
+    const name = document.getElementById('item-name').value;
+    const quantity = document.getElementById('quantity').value;
+    const description = document.getElementById('description').value;
+    if(!name || !quantity) return;
+    if(quantity < 0) return;
+    console.log('creating item');
+    console.log(name, quantity, description);
+    const item = new Item(name, Number(quantity), description);
+    createItem(item).then(updateTableFromAPI);
+}
 start();

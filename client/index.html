@@ -15,11 +15,33 @@
                 <th>Name</th>
                 <th>Quantity</th>
                 <th>Description</th>
+                <th>Delete</th>
+                <th>to csv</th>
             </thead>
             <tbody id="table-body">
                 
             </tbody>
         </table>
+    </div>
+    <br>
+    <div id="items-creation">
+        <form class="form-example">
+            <div class="form-example">
+                <label for="item-name">Enter the name of the item: </label>
+                <input type="text" name="item-name" id="item-name" required>
+            </div>
+            <div class="form-example">
+                <label for="quantity">Enter the quantity: </label>
+                <input type="number" name="quantity" id="quantity" min="0" required>
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <textarea name="description" id="description" cols="30" rows="10"></textarea>
+            </div>
+            <div class="form-example">
+                <input type="button" value="create" onclick="createItemForm()">
+            </div>
+        </form>          
     </div>
 </body>
 </html>

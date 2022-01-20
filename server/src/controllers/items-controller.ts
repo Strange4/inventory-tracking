@@ -82,7 +82,6 @@ class ItemController implements Controller {
             } else {
                 response.status(404).send('item not found');
             }
-
         }
         next();
     }
