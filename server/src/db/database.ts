@@ -18,7 +18,7 @@ class Database implements IDatabase {
         const updatedCollection = document instanceof Array ? [...document] : [document];
         const collection = this.collections.get(collectionName);
         if(collection){
-            this.collections.set(collectionName, updatedCollection);
+            this.collections.set(collectionName, [...collection, ...updatedCollection]);
             return;
         }
         this.collections.set(collectionName, updatedCollection);
